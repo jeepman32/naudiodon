@@ -4,9 +4,9 @@ A [Node.js](http://nodejs.org/) [addon](http://nodejs.org/api/addons.html) that 
 
 This is a fork of [node-portaudio](/joeferner/node-portaudio), refactored by:
 
-* changing from an event model to a stream model;
-* using the new API for building native Addons [N-API](https://nodejs.org/dist/latest-v8.x/docs/api/n-api.html#n_api_n_api) to enable portability between node versions without recompiling.
-* adding in local copies of libraries so that portaudio does not have to be installed preemptively.
+- changing from an event model to a stream model;
+- using the new API for building native Addons [N-API](https://nodejs.org/dist/latest-v8.x/docs/api/n-api.html#n_api_n_api) to enable portability between node versions without recompiling.
+- adding in local copies of libraries so that portaudio does not have to be installed preemptively.
 
 Little of the original remains but I am very grateful for Joe Ferner for the inspiration and framework to get started.
 
@@ -24,6 +24,9 @@ Naudiodon is designed to be `require`d to use from your own application to provi
 
 For Raspberry Pi users, please note that this library is not intended for use with the internal sound card. Please use an external USB sound card or GPIO breakout board such as the [_Pi-DAC+ Full-HD Audio Card_](https://www.modmypi.com/raspberry-pi/breakout-boards/iqaudio/pi-dac-plus-full-hd-audio-card/?tag=pi-dac).
 
+Build has been fixed from 2.4.0 as GCC 13 broke builds.
+See [this](https://github.com/Alexays/Waybar/issues/2159#issuecomment-1545010686) issue in another repo which was affected.
+
 ## Using naudiodon
 
 ### Listing devices
@@ -31,7 +34,7 @@ For Raspberry Pi users, please note that this library is not intended for use wi
 To get list of supported devices, call the `getDevices()` function.
 
 ```javascript
-var portAudio = require('naudiodon');
+var portAudio = require("naudiodon");
 
 console.log(portAudio.getDevices());
 ```
@@ -39,8 +42,10 @@ console.log(portAudio.getDevices());
 An example of the output is:
 
 ```javascript
-[ { id: 0,
-    name: 'Built-in Microph',
+[
+  {
+    id: 0,
+    name: "Built-in Microph",
     maxInputChannels: 2,
     maxOutputChannels: 0,
     defaultSampleRate: 44100,
@@ -48,9 +53,11 @@ An example of the output is:
     defaultLowOutputLatency: 0.01,
     defaultHighInputLatency: 0.012154195011337868,
     defaultHighOutputLatency: 0.1,
-    hostAPIName: 'Core Audio' },
-  { id: 1,
-    name: 'Built-in Input',
+    hostAPIName: "Core Audio",
+  },
+  {
+    id: 1,
+    name: "Built-in Input",
     maxInputChannels: 2,
     maxOutputChannels: 0,
     defaultSampleRate: 44100,
@@ -58,9 +65,11 @@ An example of the output is:
     defaultLowOutputLatency: 0.01,
     defaultHighInputLatency: 0.012154195011337868,
     defaultHighOutputLatency: 0.1,
-    hostAPIName: 'Core Audio' },
-  { id: 2,
-    name: 'Built-in Output',
+    hostAPIName: "Core Audio",
+  },
+  {
+    id: 2,
+    name: "Built-in Output",
     maxInputChannels: 0,
     maxOutputChannels: 2,
     defaultSampleRate: 44100,
@@ -68,7 +77,9 @@ An example of the output is:
     defaultLowOutputLatency: 0.002108843537414966,
     defaultHighInputLatency: 0.1,
     defaultHighOutputLatency: 0.012267573696145125,
-    hostAPIName: 'Core Audio' } ]
+    hostAPIName: "Core Audio",
+  },
+];
 ```
 
 Note that the device `id` parameter index value can be used as to specify which device to use for playback or recording with optional parameter `deviceId`.
@@ -78,10 +89,11 @@ Note that the device `id` parameter index value can be used as to specify which 
 To get list of host APIs, call the `getHostAPIs()` function.
 
 ```javascript
-var portAudio = require('naudiodon');
+var portAudio = require("naudiodon");
 
 console.log(portAudio.getHostAPIs());
 ```
+
 An example of the output is:
 
 ```javascript
@@ -94,6 +106,7 @@ An example of the output is:
        defaultOutput: 5 },
       { /* ... */ } ] }
 ```
+
 Note that the `defaultInput` and `defaultOutput` values can be used as to specify which device to use for playback or recording with optional parameter `deviceId`.
 
 ### Playing audio
@@ -101,8 +114,8 @@ Note that the `defaultInput` and `defaultOutput` values can be used as to specif
 Playing audio involves streaming audio data to a new instance of `AudioIO` configured with `outOptions` - which returns a Node.js [Writable Stream](https://nodejs.org/dist/latest-v6.x/docs/api/stream.html#stream_writable_streams):
 
 ```javascript
-const fs = require('fs');
-const portAudio = require('naudiodon');
+const fs = require("fs");
+const portAudio = require("naudiodon");
 
 // Create an instance of AudioIO with outOptions (defaults are as below), which will return a WritableStream
 var ao = new portAudio.AudioIO({
@@ -111,13 +124,13 @@ var ao = new portAudio.AudioIO({
     sampleFormat: portAudio.SampleFormat16Bit,
     sampleRate: 48000,
     deviceId: -1, // Use -1 or omit the deviceId to select the default device
-    closeOnError: true // Close the stream if an audio error is detected, if set false then just log the error
-  }
+    closeOnError: true, // Close the stream if an audio error is detected, if set false then just log the error
+  },
 });
 
 // Create a stream to pipe into the AudioOutput
 // Note that this does not strip the WAV header so a click will be heard at the beginning
-var rs = fs.createReadStream('steam_48000.wav');
+var rs = fs.createReadStream("steam_48000.wav");
 
 // Start piping data and start streaming
 rs.pipe(ao);
@@ -129,8 +142,8 @@ ao.start();
 Recording audio involves streaming audio data from a new instance of `AudioIO` configured with `inOptions` - which returns a Node.js [Readable Stream](https://nodejs.org/dist/latest-v6.x/docs/api/stream.html#stream_readable_streams):
 
 ```javascript
-var fs = require('fs');
-var portAudio = require('../index.js');
+var fs = require("fs");
+var portAudio = require("../index.js");
 
 // Create an instance of AudioIO with inOptions (defaults are as below), which will return a ReadableStream
 var ai = new portAudio.AudioIO({
@@ -139,31 +152,31 @@ var ai = new portAudio.AudioIO({
     sampleFormat: portAudio.SampleFormat16Bit,
     sampleRate: 44100,
     deviceId: -1, // Use -1 or omit the deviceId to select the default device
-    closeOnError: true // Close the stream if an audio error is detected, if set false then just log the error
-  }
+    closeOnError: true, // Close the stream if an audio error is detected, if set false then just log the error
+  },
 });
 
 // Create a write stream to write out to a raw audio file
-var ws = fs.createWriteStream('rawAudio.raw');
+var ws = fs.createWriteStream("rawAudio.raw");
 
 //Start streaming
 ai.pipe(ws);
 ai.start();
-
 ```
 
 Note that this produces a raw audio file - wav headers would be required to create a wav file. However this basic example produces a file may be read by audio software such as Audacity, using the sample rate and format parameters set when establishing the stream.
 
 There is an additional `"timestamp"` property available on the buffers that are streamed from the input which represents a time value for the first sample in the returned buffer. It can be accessed as follows:
+
 ```javascript
-ai.on('data', buf => console.log(buf.timestamp));
+ai.on("data", (buf) => console.log(buf.timestamp));
 ```
 
 To stop the recording, call `ai.quit()`. For example:
 
 ```javascript
-process.on('SIGINT', () => {
-  console.log('Received SIGINT. Stopping recording.');
+process.on("SIGINT", () => {
+  console.log("Received SIGINT. Stopping recording.");
   ai.quit();
 });
 ```
@@ -173,7 +186,7 @@ process.on('SIGINT', () => {
 A bi-directional audio stream is available by creating an instance of `AudioIO` configured with both `inOptions` and `outOptions` - which returns a Node.js [Duplex stream](https://nodejs.org/dist/latest-v6.x/docs/api/stream.html#stream_duplex_and_transform_streams):
 
 ```javascript
-var portAudio = require('../index.js');
+var portAudio = require("../index.js");
 
 // Create an instance of AudioIO with inOptions and outOptions, which will return a DuplexStream
 var aio = new portAudio.AudioIO({
@@ -181,14 +194,14 @@ var aio = new portAudio.AudioIO({
     channelCount: 2,
     sampleFormat: portAudio.SampleFormat16Bit,
     sampleRate: 44100,
-    deviceId: -1 // Use -1 or omit the deviceId to select the default device
+    deviceId: -1, // Use -1 or omit the deviceId to select the default device
   },
   outOptions: {
     channelCount: 2,
     sampleFormat: portAudio.SampleFormat16Bit,
     sampleRate: 44100,
-    deviceId: -1 // Use -1 or omit the deviceId to select the default device
-  }
+    deviceId: -1, // Use -1 or omit the deviceId to select the default device
+  },
 });
 
 aio.start();
