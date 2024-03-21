@@ -18,6 +18,7 @@
 
 #include "node_api.h"
 #include <memory>
+#include <string>
 #include <mutex>
 
 struct PaStreamParameters;
